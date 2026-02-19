@@ -1,0 +1,106 @@
+/* @settings
+name: Automatic Table of Contents
+id: automatic-table-of-contents
+settings:
+  -
+    id: toc-font-size
+    title: Font size
+    type: variable-text
+    default: inherit
+  -
+    id: toc-indent-size
+    title: Indent size
+    type: variable-text
+    default: 1.5em
+  -
+    id: toc-line-height
+    title: Line height
+    type: variable-text
+    default: 1.6
+  -
+    id: toc-link-color
+    title: Link color
+    type: variable-themed-color
+    format: hex
+    default-light: '#705dcf'
+    default-dark: '#7f6df2'
+  -
+    id: toc-bullet-style
+    title: Bullet style
+    description: CSS list-style-type value (disc, circle, square, none, etc.)
+    type: variable-text
+    default: disc
+  -
+    id: toc-border-left
+    title: Left border
+    description: CSS border shorthand (e.g. "2px solid gray" or "none")
+    type: variable-text
+    default: none
+  -
+    id: toc-background
+    title: Background color
+    type: variable-themed-color
+    format: hex
+    default-light: '#00000000'
+    default-dark: '#00000000'
+  -
+    id: toc-padding
+    title: Container padding
+    type: variable-text
+    default: 0
+*/
+
+/* Baseline screen styles */
+.automatic-toc {
+  font-size: var(--toc-font-size, inherit);
+  line-height: var(--toc-line-height, 1.6);
+  background: var(--toc-background, transparent);
+  padding: var(--toc-padding, 0);
+  border-left: var(--toc-border-left, none);
+}
+
+.automatic-toc ul,
+.automatic-toc ol {
+  padding-left: var(--toc-indent-size, 1.5em);
+}
+
+.automatic-toc ul {
+  list-style-type: var(--toc-bullet-style, disc);
+}
+
+.automatic-toc a {
+  color: var(--toc-link-color);
+}
+
+/* Foldable TOC styles */
+.automatic-toc details > summary {
+  cursor: pointer;
+  list-style-type: disclosure-closed;
+}
+
+.automatic-toc details[open] > summary {
+  list-style-type: disclosure-open;
+}
+
+.automatic-toc details > summary:hover {
+  opacity: 0.8;
+}
+
+/* Print styles */
+@media print {
+  .automatic-toc {
+    display: block !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .automatic-toc ul,
+  .automatic-toc ol {
+    break-inside: avoid;
+  }
+
+  .automatic-toc a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

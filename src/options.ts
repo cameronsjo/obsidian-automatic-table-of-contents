@@ -53,6 +53,11 @@ const availableOptions: AvailableOptions = {
     default: DEFAULT_OPTIONS.hideWhenEmpty,
     comment: 'Hide TOC if no headings are found',
   },
+  foldable: {
+    type: 'boolean',
+    default: DEFAULT_OPTIONS.foldable,
+    comment: 'Make TOC sections collapsible',
+  },
   debugInConsole: {
     type: 'boolean',
     default: false,
@@ -110,6 +115,7 @@ export function parseOptionsFromSourceText(
     exclude: DEFAULT_OPTIONS.exclude,
     includeLinks: DEFAULT_OPTIONS.includeLinks,
     hideWhenEmpty: DEFAULT_OPTIONS.hideWhenEmpty,
+    foldable: DEFAULT_OPTIONS.foldable,
     debugInConsole: DEFAULT_OPTIONS.debugInConsole,
   }
 

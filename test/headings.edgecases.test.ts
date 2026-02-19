@@ -9,7 +9,7 @@ describe('getMarkdownFromHeadings - edge cases', () => {
     expect(md).toContain('no headings found')
   })
 
-  test('Handles headings with gaps in hierarchy', () => {
+  test('Normalizes indentation when headings have gaps in hierarchy', () => {
     const headings = [
       {
         level: 1,
@@ -28,10 +28,39 @@ describe('getMarkdownFromHeadings - edge cases', () => {
       }, // gap
     ]
     const options = parseOptionsFromSourceText('style: nestedList')
+    options.includeLinks = false
     const md = getMarkdownFromHeadings(headings, options)
-    expect(md).toContain('Level 1')
-    expect(md).toContain('Level 3')
-    expect(md).toContain('Level 5')
+    // Gaps should be normalized: depth 0, 1, 2 instead of 0, 2, 4
+    expect(md).toBe('- Level 1\n\t- Level 3 (no level 2)\n\t\t- Level 5 (no level 4)')
+  })
+
+  test('Normalizes gaps then resets when returning to shallower level', () => {
+    const headings = [
+      {
+        level: 1,
+        heading: 'H1',
+        position: { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } },
+      },
+      {
+        level: 4,
+        heading: 'H4',
+        position: { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } },
+      },
+      {
+        level: 1,
+        heading: 'H1b',
+        position: { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } },
+      },
+      {
+        level: 3,
+        heading: 'H3',
+        position: { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } },
+      },
+    ]
+    const options = parseOptionsFromSourceText('style: nestedList')
+    options.includeLinks = false
+    const md = getMarkdownFromHeadings(headings, options)
+    expect(md).toBe('- H1\n\t- H4\n- H1b\n\t- H3')
   })
 
   test('Handles all headings filtered out by minLevel/maxLevel', () => {

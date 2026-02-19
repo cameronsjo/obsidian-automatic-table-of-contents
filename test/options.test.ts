@@ -14,6 +14,7 @@ describe('Options', () => {
       exclude: null,
       includeLinks: true,
       hideWhenEmpty: false,
+      foldable: false,
       debugInConsole: false,
     })
   })
@@ -40,6 +41,7 @@ describe('Options', () => {
       exclude: /test#2/gi,
       includeLinks: false,
       hideWhenEmpty: true,
+      foldable: false,
       debugInConsole: true,
     })
   })
@@ -153,6 +155,7 @@ describe('Options', () => {
         exclude: null,
         includeLinks: false,
         hideWhenEmpty: true,
+        foldable: false,
         debugInConsole: false,
       })
     })

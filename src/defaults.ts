@@ -10,6 +10,7 @@ export interface TableOfContentsOptions {
   exclude: RegExp | null
   includeLinks: boolean
   hideWhenEmpty: boolean
+  foldable: boolean
   debugInConsole: boolean
 }
 
@@ -26,5 +27,6 @@ export const DEFAULT_OPTIONS = {
   exclude: null,
   includeLinks: true,
   hideWhenEmpty: false,
+  foldable: false,
   debugInConsole: false,
 } as const satisfies TableOfContentsOptions

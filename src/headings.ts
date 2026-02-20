@@ -46,15 +46,22 @@ function getMarkdownNestedOrderedListFromHeadings(
   return getMarkdownListFromHeadings(headings, true, options)
 }
 
-function getMarkdownListFromHeadings(
+export interface FilteredHeading {
+  heading: HeadingCache
+  depth: number
+}
+
+/**
+ * Filter headings by options and compute normalized depths
+ * Shared by both markdown and foldable HTML renderers
+ */
+export function getFilteredHeadings(
   headings: HeadingCache[],
-  isOrdered: boolean,
   options: TableOfContentsOptions,
-): string | null {
-  const prefix = isOrdered ? '1.' : '-'
-  const lines: string[] = []
+): FilteredHeading[] {
   const minLevel =
     options.minLevel > 0 ? options.minLevel : Math.min(...headings.map((heading) => heading.level))
+  const filteredHeadings: HeadingCache[] = []
   let unallowedLevel = 0
   for (const heading of headings) {
     if (unallowedLevel > 0 && heading.level > unallowedLevel) continue
@@ -62,17 +69,49 @@ function getMarkdownListFromHeadings(
       unallowedLevel = 0
     }
     if (!isHeadingAllowed(heading.heading, options)) {
-      unallowedLevel = heading.level
+      // Only cascade exclusion to children when using exclude filter
+      // With include filter, each heading should be evaluated independently (#76)
+      if (options.exclude) {
+        unallowedLevel = heading.level
+      }
       continue
     }
     if (heading.level < minLevel) continue
     if (options.maxLevel > 0 && heading.level > options.maxLevel) continue
     if (heading.heading.length === 0) continue
-    lines.push(
-      `${'\t'.repeat(heading.level - minLevel)}${prefix} ${getFormattedMarkdownHeading(heading.heading, options)}`,
-    )
+    filteredHeadings.push(heading)
   }
+  const depths = computeNormalizedDepths(filteredHeadings)
+  return filteredHeadings.map((heading, i) => ({ heading, depth: depths[i] as number }))
+}
+
+function getMarkdownListFromHeadings(
+  headings: HeadingCache[],
+  isOrdered: boolean,
+  options: TableOfContentsOptions,
+): string | null {
+  const prefix = isOrdered ? '1.' : '-'
+  const filtered = getFilteredHeadings(headings, options)
+  const lines = filtered.map(({ heading, depth }) => {
+    return `${'\t'.repeat(depth)}${prefix} ${getFormattedMarkdownHeading(heading.heading, options)}`
+  })
   return lines.length > 0 ? lines.join('\n') : null
+}
+
+function computeNormalizedDepths(headings: HeadingCache[]): number[] {
+  const depths: number[] = []
+  const levelStack: number[] = []
+  for (const heading of headings) {
+    while (
+      levelStack.length > 0 &&
+      (levelStack[levelStack.length - 1] as number) >= heading.level
+    ) {
+      levelStack.pop()
+    }
+    levelStack.push(heading.level)
+    depths.push(levelStack.length - 1)
+  }
+  return depths
 }
 
 function getMarkdownInlineFirstLevelFromHeadings(

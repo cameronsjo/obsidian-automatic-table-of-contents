@@ -148,6 +148,25 @@ describe('Nested headings', () => {
     expect(md).toEqual(expectedMd)
   })
 
+  test('Include filter allows child headings to match independently (#76)', () => {
+    const headings = toHeadingCache([
+      { heading: 'Introduction', level: 1 },
+      { heading: 'Background', level: 2 },
+      { heading: 'Methods', level: 2 },
+      { heading: 'Results', level: 1 },
+      { heading: 'Analysis', level: 2 },
+    ])
+    const options = parseOptionsFromSourceText('')
+    options.includeLinks = false
+    options.include = /Methods|Analysis/
+    const md = getMarkdownFromHeadings(headings, options)
+    const expectedMd = sanitizeMd(`
+- Methods
+- Analysis
+`)
+    expect(md).toEqual(expectedMd)
+  })
+
   test('Returns indented list with excludes', () => {
     const options = parseOptionsFromSourceText('')
     options.includeLinks = false
